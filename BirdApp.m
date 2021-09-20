@@ -91,10 +91,36 @@ numberTe = str2double(temp3);
 opn1 = get(handles.mfcc,'value');
 opn2 = get(handles.timber,'value');
 %save DATA.mat temp
-x = 10;
+
 n = 1;
-for i=2:numberB
+if opn1 == 1
+  for i=1:numberB
     for j =1:numberTr
+        
+        filename = sprintf('%d_%d.wav', i , j);
+        filename=[DIRPATH '\' filename];
+        
+        [x fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+        if (size(x,2) == 2) % converted into mono
+            x= x(:,1);
+        end
+        a = miraudio(x); %MIRToolbox object
+       
+            mf=mfcc_common(x,fs,13); % first 13 component of mfcc
+            mf = mf'; %transpose
+            Training_feature(n,1:13) = mf(1,1:13); % storing feature of each mfcc component
+            n = n+1;
+    
+    end
+  end
+
+
+numberTr = numberTr+1;
+m =1;
+
+%this loop for testing feature
+for i=1:numberB
+    for j =numberTr:numberTe
         
         filename = sprintf('%d_%d.wav', i , j);
         filename=[DIRPATH '\' filename];
@@ -107,11 +133,57 @@ for i=2:numberB
         if opn1 == 1
             mf=mfcc_common(x,fs,13); % first 13 component of mfcc
             mf = mf'; %transpose
-            feature(n,1:13) = mf(1,1:13); % storing feature of each mfcc component
-            n = n+1;
+            Testing_feature(m,1:13) = mf(1,1:13); % storing feature of each mfcc component
+            m = m+1;
         end
     end
+
 end
+b = 10;
+
+%putting training feature into excel file
+Features = 'Feature.xlsx';
+filenameXl = [DIRPATH '\' Features];
+b=10;
+
+xlswrite(filenameXl,Training_feature,'Traning_feature');
+b = 10;  
+
+end
+
+
+if opn2 == 1
+    n = 1;
+   
+    for i=1:numberB
+       
+    for j =1:numberTr
+          XY = 1;
+        filename = sprintf('%d_%d.wav', i , j);
+        filename=[DIRPATH '\' filename];
+        
+        [x fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+        if (size(x,2) == 2) % converted into mono
+            x= x(:,1);
+        end
+        a = miraudio(x); %MIRToolbox object
+       
+        ZCR = mirzerocross(a);%ZCR keeps track of change of sign of signal
+        
+            Training_feature(n,XY) = mirgetdata(ZCR);
+            XY = XY + 1;
+        ROLL = mirrolloff(a);
+        
+             Training_feature(n,XY) = mirgetdata(ROLL);
+            XY = XY + 1;
+     n = n+1;
+    end
+    
+end
+    
+end
+
+
 
 
 
