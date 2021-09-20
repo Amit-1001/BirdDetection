@@ -5,4 +5,6 @@
 - create new branch
 - name of branch should be your name
 - push changes to master 
+- Dont change master directly
+-
 
