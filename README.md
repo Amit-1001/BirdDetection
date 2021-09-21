@@ -6,5 +6,6 @@
 - name of branch should be your name
 - push changes to master 
 - Dont change master directly
+-Make sure code run correctly before merging
 
 
