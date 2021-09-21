@@ -144,8 +144,7 @@ if opn1 == 1
     b=10;
 
     xlswrite(filenameXl,Training_feature,'Traning_feature');
-    b = 10;  
-    
+    b = 10;   
 end
 
 %for timber
@@ -224,7 +223,6 @@ function training_features_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function testing_features_Callback(hObject, eventdata, handles)
