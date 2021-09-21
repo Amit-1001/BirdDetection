@@ -93,94 +93,103 @@ opn2 = get(handles.timber,'value');
 %save DATA.mat temp
 
 n = 1;
+% For mfcc
 if opn1 == 1
-  for i=1:numberB
-    for j =1:numberTr
-        
-        filename = sprintf('%d_%d.wav', i , j);
-        filename=[DIRPATH '\' filename];
-        
-        [x fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
-        if (size(x,2) == 2) % converted into mono
-            x= x(:,1);
-        end
-        a = miraudio(x); %MIRToolbox object
-       
+    for i=1:numberB
+        for j =1:numberTr
+            filename = sprintf('%d_%d.wav', i , j);
+            filename=[DIRPATH '\' filename];
+
+            [x, fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+            if (size(x,2) == 2) % converted into mono
+                x= x(:,1);
+            end
+            a = miraudio(x); %MIRToolbox object
+
             mf=mfcc_common(x,fs,13); % first 13 component of mfcc
             mf = mf'; %transpose
             Training_feature(n,1:13) = mf(1,1:13); % storing feature of each mfcc component
             n = n+1;
+        end
+    end
+
     
-    end
-  end
+    numberTr = numberTr+1;
+    m =1;
 
+    %this loop for testing feature
+    for i=1:numberB
+        for j =numberTr:numberTe
+            filename = sprintf('%d_%d.wav', i , j);
+            filename=[DIRPATH '\' filename];
 
-numberTr = numberTr+1;
-m =1;
-
-%this loop for testing feature
-for i=1:numberB
-    for j =numberTr:numberTe
-        
-        filename = sprintf('%d_%d.wav', i , j);
-        filename=[DIRPATH '\' filename];
-        
-        [x fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
-        if (size(x,2) == 2) % converted into mono
-            x= x(:,1);
-        end
-        a = miraudio(x); %MIRToolbox object
-        if opn1 == 1
-            mf=mfcc_common(x,fs,13); % first 13 component of mfcc
-            mf = mf'; %transpose
-            Testing_feature(m,1:13) = mf(1,1:13); % storing feature of each mfcc component
-            m = m+1;
+            [x, fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+            if (size(x,2) == 2) % converted into mono
+                x= x(:,1);
+            end
+            a = miraudio(x); %MIRToolbox object
+            if opn1 == 1
+                mf=mfcc_common(x,fs,13); % first 13 component of mfcc
+                mf = mf'; %transpose
+                Testing_feature(m,1:13) = mf(1,1:13); % storing feature of each mfcc component
+                m = m+1;
+            end
         end
     end
+    b = 10;
 
-end
-b = 10;
+    %putting training feature into excel file
+    Features = 'Feature.xlsx';
+    filenameXl = [DIRPATH '\' Features];
+    b=10;
 
-%putting training feature into excel file
-Features = 'Feature.xlsx';
-filenameXl = [DIRPATH '\' Features];
-b=10;
-
-xlswrite(filenameXl,Training_feature,'Traning_feature');
-b = 10;  
-
+    xlswrite(filenameXl,Training_feature,'Traning_feature');
+    b = 10;  
+    
 end
 
-
+%for timber
 if opn2 == 1
     n = 1;
    
-    for i=1:numberB
-       
-    for j =1:numberTr
-          XY = 1;
-        filename = sprintf('%d_%d.wav', i , j);
-        filename=[DIRPATH '\' filename];
+    for i=1:numberB   
+        for j =1:numberTr
+            XY = 1;
+            filename = sprintf('%d_%d.wav', i , j);
+            filename=[DIRPATH '\' filename];
         
-        [x fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
-        if (size(x,2) == 2) % converted into mono
-            x= x(:,1);
-        end
-        a = miraudio(x); %MIRToolbox object
+            [x, fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+            if (size(x,2) == 2) % converted into mono
+                x= x(:,1);
+            end
+            a = miraudio(x); %MIRToolbox object
        
-        ZCR = mirzerocross(a);%ZCR keeps track of change of sign of signal
-        
+            ZCR = mirzerocross(a);  %ZCR keeps track of change of sign of signal
             Training_feature(n,XY) = mirgetdata(ZCR);
             XY = XY + 1;
-        ROLL = mirrolloff(a);
         
-             Training_feature(n,XY) = mirgetdata(ROLL);
+            ROLL = mirrolloff(a);   %mirrolloff calculates the spectral roll-off in Hz.
+            Training_feature(n,XY) = mirgetdata(ROLL);
             XY = XY + 1;
-     n = n+1;
+            
+            BRIGHT = mirbrightness(a);  %calculates the spectral brightness, i.e. the amount
+            Training_feature(n,XY) = mirgetdata(BRIGHT);
+            XY = XY + 1;
+         
+%             z = mirroughness(a);    %calculates the roughness, due to beating phenomenon between close frequency peaks. 
+%             ROUGH = mirgetdata(z);
+%             ROUGH = ROUGH';
+%             Training_feature(n,XY) = ROUGH; 
+%             XY = XY + 1;
+            
+            REGULARITY = mirregularity(a);  %calculates the irregularity of a spectrum, i.e.,
+%       the degree of variation of the successive peaks of the spectrum.
+            Training_feature(n,XY) = mirgetdata(REGULARITY);
+            XY = XY + 1;
+            
+            n = n+1;
+        end
     end
-    
-end
-    
 end
 
 
