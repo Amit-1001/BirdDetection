@@ -163,7 +163,7 @@ if opn2 == 1
                 x= x(:,1);
             end
             a = miraudio(x); %MIRToolbox object
-       
+            
             ZCR = mirzerocross(a);  %ZCR keeps track of change of sign of signal
             Training_feature(n,XY) = mirgetdata(ZCR);
             XY = XY + 1;
@@ -175,23 +175,27 @@ if opn2 == 1
             BRIGHT = mirbrightness(a);  %calculates the spectral brightness, i.e. the amount
             Training_feature(n,XY) = mirgetdata(BRIGHT);
             XY = XY + 1;
-         
-%             z = mirroughness(a);    %calculates the roughness, due to beating phenomenon between close frequency peaks. 
-%             ROUGH = mirgetdata(z);
-%             ROUGH = ROUGH';
-%             Training_feature(n,XY) = ROUGH; 
-%             XY = XY + 1;
-            
-            REGULARITY = mirregularity(a);  %calculates the irregularity of a spectrum, i.e.,
-%       the degree of variation of the successive peaks of the spectrum.
+
+
+            spectrum = mirspectrum(a);
+            peaks = mirpeaks(spectrum);
+            REGULARITY = mirregularity(peaks);     %calculates the irregularity of a spectrum, i.e.,
+           %       the degree of variation of the successive peaks of the spectrum.
             Training_feature(n,XY) = mirgetdata(REGULARITY);
             XY = XY + 1;
             
+            spectrum = mirspectrum(a);
+            peaks = mirpeaks(spectrum);
+            z = mirroughness(peaks);    %calculates the roughness, due to beating phenomenon between close frequency peaks. 
+            ROUGH = mirgetdata(z);
+            ROUGH = ROUGH';
+            Training_feature(n,XY) = ROUGH; 
+            XY = XY + 1;
             n = n+1;
         end
     end
 end
-
+var =10;
 
 
 
