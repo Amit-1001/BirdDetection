@@ -1,4 +1,5 @@
 # BirdDetection
+<img src/>
 # How to contibute
 - First fork project
 - clone it to your local machine
