@@ -22,7 +22,7 @@ function varargout = BirdApp(varargin)
 
 % Edit the above text to modify the response to help BirdApp
 
-% Last Modified by GUIDE v2.5 15-Aug-2021 18:36:16
+% Last Modified by GUIDE v2.5 05-Dec-2021 14:04:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,6 +74,7 @@ function varargout = BirdApp_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
+
 % --- Executes on button press in train_extract.
 function train_extract_Callback(hObject, eventdata, handles)
 % hObject    handle to train_extract (see GCBO)
@@ -84,13 +85,17 @@ load DATA.mat DIRPATH
 temp2 = get(handles.train_samp,'string');
 temp3 = get(handles.test_samp,'string');
 
-numberB = str2double(temp1);
-numberTr = str2double(temp2);
+numberB = str2double(temp1); % number of birds
+numberTr = str2double(temp2); % number of training 
 numberTe = str2double(temp3);
 
+
+
+b =1
 opn1 = get(handles.mfcc,'value');
 opn2 = get(handles.timber,'value');
 %save DATA.mat temp
+%save 'DATA.mat' 
 
 n = 1;
 % For mfcc
@@ -147,8 +152,13 @@ if opn1 == 1
     b = 10;  
     
 end
+save 'training_feature.mat' 'Training_feature' 
+%save 'DATA.mat' 'Training_feature' 
+save 'testing_feature.mat' 'Testing_feature'
+
 
 %for timber
+x = 10;
 if opn2 == 1
     n = 1;
    
@@ -195,6 +205,8 @@ if opn2 == 1
         end
     end
 end
+
+
 var =10;
 
 
@@ -278,7 +290,7 @@ function select_DB_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 DIRPATH = uigetdir();
 set(handles.path,'string',DIRPATH);
-save DATA.mat DIRPATH
+save 'DATA.mat' 'DIRPATH'
 
 
 function no_birds_Callback(hObject, eventdata, handles)
@@ -370,3 +382,145 @@ function path_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in generate_btn.
+function generate_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to generate_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%load 'DATA.mat'
+
+temp1 = get(handles.no_birds,'string');
+
+temp2 = get(handles.train_samp,'string');
+temp3 = get(handles.test_samp,'string');
+
+numberB = str2double(temp1); % number of birds
+numberTr = str2double(temp2); % number of training bird
+numberTe = str2double(temp3); % number of testing bird
+
+
+
+x = 10;
+for i=0:numberB-1 % target generation
+    for j=numberTr*i:numberTr*i+numberTr-1
+        Target_Tr(i+1,j+1)=1;
+    end
+end
+% % % %%
+%%TARGET FOR TESTING
+%%
+Target_Ts=zeros(numberB,numberTe-numberTr);
+numberTr=numberTe-numberTr;
+for i=0:numberB-1
+    for j=numberTr*i:numberTr*i+numberTr-1
+        Target_Ts(i+1,j+1)=1;
+    end
+end
+
+save 'DATA.mat' 'Target_Tr' 'Target_Ts'  
+x =90
+
+
+
+
+% --- Executes on button press in MSVM.
+function MSVM_Callback(hObject, eventdata, handles)
+% hObject    handle to MSVM (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of MSVM
+
+
+% --- Executes on button press in FFBPNN.
+function FFBPNN_Callback(hObject, eventdata, handles)
+% hObject    handle to FFBPNN (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of FFBPNN
+
+
+% --- Executes on button press in training_btn.
+function training_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to training_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+%empty neural network
+
+temp1 = get(handles.no_birds,'string');
+
+temp2 = get(handles.train_samp,'string');
+temp3 = get(handles.test_samp,'string');
+
+numberB = str2double(temp1); % number of birds
+numberTr = str2double(temp2); % number of training bird
+numberTe = str2double(temp3); %number of Testing bird
+
+setdemorandstream(491218382)
+op6 = get(handles.MSVM,'value');
+op7 = get(handles.FFBPNN,'value'); 
+
+      
+
+        if(op7==1)
+
+                net = feedforwardnet(13,13); % for 13 its 55% 
+                
+                % Now the network is ready to be trained. The samples are automatically
+                % divided into training, validation and test sets. The training set is
+                % used to teach the network. Training continues as long as the network
+                % continues improving on the validation set. The test set provides a
+                % completely independent measure of network accuracy.
+                load 'training_feature.mat' 'Training_feature'
+                load 'DATA.mat'  'Target_Tr'
+
+                Training_feature
+                Target_Tr
+                %figure(10)
+                %view(net)
+
+                [net,tr] = train(net,Training_feature',Target_Tr); %taking transpose of Traning_feature
+                
+                
+                
+                
+                save 'net.mat' 'net'
+                save 'Data.mat' 'tr'
+                x =10;
+        end
+
+%hiden layer neuron = (2/3 * input+Out)
+%%
+
+
+
+
+
+
+% --- Executes on button press in Test_btn.
+function Test_btn_Callback(hObject, eventdata, handles)
+% hObject    handle to Test_btn (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+op6 = get(handles.MSVM,'value');
+op7 = get(handles.FFBPNN,'value'); 
+
+    if(op6==1)
+    
+    end
+    
+    if(op7==1)
+           load 'testing_feature.mat' 'Testing_feature'
+           load 'Data.mat' 'tr' 
+           load 'net.mat' 'net'
+           
+           res = sim(net,Testing_feature');
+        
+    end
+
