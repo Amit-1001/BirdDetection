@@ -151,12 +151,10 @@ if opn1 == 1
     xlswrite(filenameXl,Training_feature,'Traning_feature');
     b = 10;  
     
-    %Traingin feature and Testing feature of MFCC
-    save 'training_feature.mat' 'Training_feature' 
-    %save 'DATA.mat' 'Training_feature' 
-    save 'testing_feature.mat' 'Testing_feature'
 end
-
+save 'training_feature.mat' 'Training_feature' 
+%save 'DATA.mat' 'Training_feature' 
+save 'testing_feature.mat' 'Testing_feature'
 
 
 %for timber
@@ -226,15 +224,15 @@ if opn2 == 1
             a = miraudio(x); %MIRToolbox object
             
             ZCR = mirzerocross(a);  %ZCR keeps track of change of sign of signal
-            Testing_feature(p,XY) = mirgetdata(ZCR);
+            Testing_feature(n,XY) = mirgetdata(ZCR);
             XY = XY + 1;
         
             ROLL = mirrolloff(a);   %mirrolloff calculates the spectral roll-off in Hz.
-            Testing_feature(p,XY) = mirgetdata(ROLL);
+            Testing_feature(n,XY) = mirgetdata(ROLL);
             XY = XY + 1;
             
             BRIGHT = mirbrightness(a);  %calculates the spectral brightness, i.e. the amount
-            Testing_feature(p,XY) = mirgetdata(BRIGHT);
+            Testing_feature(n,XY) = mirgetdata(BRIGHT);
             XY = XY + 1;
 
 
@@ -242,7 +240,7 @@ if opn2 == 1
             peaks = mirpeaks(spectrum);
             REGULARITY = mirregularity(peaks);     %calculates the irregularity of a spectrum, i.e.,
            %       the degree of variation of the successive peaks of the spectrum.
-            Testing_feature(p,XY) = mirgetdata(REGULARITY);
+            Testing_feature(n,XY) = mirgetdata(REGULARITY);
             XY = XY + 1;
             
             spectrum = mirspectrum(a);
@@ -250,17 +248,17 @@ if opn2 == 1
             z = mirroughness(peaks);    %calculates the roughness, due to beating phenomenon between close frequency peaks. 
             ROUGH = mirgetdata(z);
             ROUGH = ROUGH';
-           Testing_feature(p,XY) = ROUGH; 
+           Testing_feature(n,XY) = ROUGH; 
             XY = XY + 1;
            p = p+1;
         end
     end 
-    save 'training_feature.mat' 'Training_feature' 
-    %save 'DATA.mat' 'Training_feature' 
-    save 'testing_feature.mat' 'Testing_feature' 
+    
 end
 
-
+save 'training_feature.mat' 'Training_feature' 
+%save 'DATA.mat' 'Training_feature' 
+save 'testing_feature.mat' 'Testing_feature'
 var =10;
 
 
@@ -523,7 +521,7 @@ op7 = get(handles.FFBPNN,'value');
     x = 100;
         if(op7==1)
 
-                net = feedforwardnet(13); % for 13 its 55% 
+                net = feedforwardnet([50,16]); % for 13 its 55% 
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
