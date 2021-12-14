@@ -141,6 +141,11 @@ if opn1 == 1
             end
         end
     end
+    x=10
+      %Traingin feature and Testing feature of MFCC
+    save 'training_feature.mat' 'Training_feature' 
+    %save 'DATA.mat' 'Training_feature' 
+    save 'testing_feature.mat' 'Testing_feature'
     b = 10;
 
     %putting training feature into excel file
@@ -151,10 +156,7 @@ if opn1 == 1
     xlswrite(filenameXl,Training_feature,'Traning_feature');
     b = 10;  
     
-    %Traingin feature and Testing feature of MFCC
-    save 'training_feature.mat' 'Training_feature' 
-    %save 'DATA.mat' 'Training_feature' 
-    save 'testing_feature.mat' 'Testing_feature'
+  
 end
 
 
