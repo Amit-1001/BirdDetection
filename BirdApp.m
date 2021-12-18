@@ -141,6 +141,11 @@ if opn1 == 1
             end
         end
     end
+    x=10
+      %Traingin feature and Testing feature of MFCC
+    save 'training_feature.mat' 'Training_feature' 
+    %save 'DATA.mat' 'Training_feature' 
+    save 'testing_feature.mat' 'Testing_feature'
     b = 10;
 
     %putting training feature into excel file
@@ -151,10 +156,9 @@ if opn1 == 1
     xlswrite(filenameXl,Training_feature,'Traning_feature');
     b = 10;  
     
+  
 end
-save 'training_feature.mat' 'Training_feature' 
-%save 'DATA.mat' 'Training_feature' 
-save 'testing_feature.mat' 'Testing_feature'
+
 
 
 %for timber
@@ -204,6 +208,58 @@ if opn2 == 1
             n = n+1;
         end
     end
+    
+    
+    %Testing feature
+    
+    numberTr = numberTr+1;
+     p = 1;
+  
+    for i=1:numberB   
+        for j =numberTr:numberTe
+            XY = 1;
+            filename = sprintf('%d_%d.wav', i , j);
+            filename=[DIRPATH '\' filename];
+        
+            [x, fs] = audioread(filename);%convert into samples x= total number of samples fs = sampling freq
+            if (size(x,2) == 2) % converted into mono
+                x= x(:,1);
+            end
+            a = miraudio(x); %MIRToolbox object
+            
+            ZCR = mirzerocross(a);  %ZCR keeps track of change of sign of signal
+            Testing_feature(p,XY) = mirgetdata(ZCR);
+            XY = XY + 1;
+        
+            ROLL = mirrolloff(a);   %mirrolloff calculates the spectral roll-off in Hz.
+            Testing_feature(p,XY) = mirgetdata(ROLL);
+            XY = XY + 1;
+            
+            BRIGHT = mirbrightness(a);  %calculates the spectral brightness, i.e. the amount
+            Testing_feature(p,XY) = mirgetdata(BRIGHT);
+            XY = XY + 1;
+
+
+            spectrum = mirspectrum(a);
+            peaks = mirpeaks(spectrum);
+            REGULARITY = mirregularity(peaks);     %calculates the irregularity of a spectrum, i.e.,
+           %       the degree of variation of the successive peaks of the spectrum.
+            Testing_feature(p,XY) = mirgetdata(REGULARITY);
+            XY = XY + 1;
+            
+            spectrum = mirspectrum(a);
+            peaks = mirpeaks(spectrum);
+            z = mirroughness(peaks);    %calculates the roughness, due to beating phenomenon between close frequency peaks. 
+            ROUGH = mirgetdata(z);
+            ROUGH = ROUGH';
+           Testing_feature(p,XY) = ROUGH; 
+            XY = XY + 1;
+           p = p+1;
+        end
+    end 
+    save 'training_feature.mat' 'Training_feature' 
+    %save 'DATA.mat' 'Training_feature' 
+    save 'testing_feature.mat' 'Testing_feature' 
 end
 
 
@@ -466,10 +522,10 @@ op6 = get(handles.MSVM,'value');
 op7 = get(handles.FFBPNN,'value'); 
 
       
-
+    x = 100;
         if(op7==1)
 
-                net = feedforwardnet(13,13); % for 13 its 55% 
+                net = feedforwardnet(13); % for 13 its 55% 
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
@@ -491,9 +547,9 @@ op7 = get(handles.FFBPNN,'value');
                 
                 save 'net.mat' 'net'
                 save 'Data.mat' 'tr'
-                x =10;
+               
         end
-
+    x = 100;
 %hiden layer neuron = (2/3 * input+Out)
 %%
 
@@ -521,6 +577,13 @@ op7 = get(handles.FFBPNN,'value');
            load 'net.mat' 'net'
            
            res = sim(net,Testing_feature');
+           
+           
+            disp(res)
+                numRows = size(res,1);
+          
+                res(res~=repmat(max(res),numRows,1)) = 0 % for finding max in each row
+
         
     end
-
+  x = 101;
