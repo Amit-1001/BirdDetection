@@ -622,7 +622,7 @@ op7 = get(handles.FFBPNN,'value');
                  disp(numberTe-numberTr)
                  disp((numberTe-numberTr)*numberB)
                   
-                for i=1:100
+                for i=1:10
                     count=1
                     max = res(1,i);
                     for j=1:10
