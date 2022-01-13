@@ -525,7 +525,7 @@ op7 = get(handles.FFBPNN,'value');
     x = 100;
         if(op7==1)
               
-                net = feedforwardnet([20,45,20,14]); % for 13 its 55% 
+                net = feedforwardnet([20,20,4]); % for 13 its 55% 
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
