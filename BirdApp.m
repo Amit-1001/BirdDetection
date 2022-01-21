@@ -22,7 +22,7 @@ function varargout = BirdApp(varargin)
 
 % Edit the above text to modify the response to help BirdApp
 
-% Last Modified by GUIDE v2.5 07-Jan-2022 22:07:58
+% Last Modified by GUIDE v2.5 21-Jan-2022 13:51:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -527,7 +527,7 @@ op8 = get(handles.knn,'value');
     x = 100;
         if(op7==1)
               
-                net = feedforwardnet([18,13]); % for 13 its 55% 
+                net = feedforwardnet([13,25]); % for 13 its 55% 
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
@@ -598,6 +598,9 @@ numberB = str2double(temp1); % number of birds
 numberTr = str2double(temp2); % number of training bird
 numberTe = str2double(temp3); %number of Testing bird
 
+totalB = numberTe - numberTr;
+totalB = numberB * totalB;
+
 
 op6 = get(handles.MSVM,'value');
 op7 = get(handles.FFBPNN,'value'); 
@@ -619,13 +622,14 @@ op7 = get(handles.FFBPNN,'value');
                 numRows = size(res,1);
           
                  %res(res~=repmat(max(res),numRows,1)) = 0 % for finding max in each row
-                 disp(numberTe-numberTr)
-                 disp((numberTe-numberTr)*numberB)
+                % disp(numberTe-numberTr)
+                 %disp((numberTe-numberTr)*numberB)
+                 disp(totalB);
                   
-                for i=1:100
+               for i=1:totalB
                     count=1
                     max = res(1,i);
-                    for j=1:10
+                    for j=1:numberB
                         if(res(j,i)>max)
                             count=j
                             max = res(j,i)
@@ -639,22 +643,29 @@ op7 = get(handles.FFBPNN,'value');
                 % Find the accuracy
                 birdCol=1
                 accuracy = 0
-                for i=1:10
-                    for j=1:10
+                for i=1:numberB
+                    for j=1:numberB
                         if(newTemp(i,birdCol)>0)
                             accuracy = accuracy+1
                         end
                         birdCol = birdCol+1;
                     end
                 end
+                
+                percentage = accuracy * 100 / totalB;
+                
+                disp(percentage);
+                
+               
+                
+                set(handles.perEdit,'string',num2str(percentage));
 
-                            disp(acuracy)
 
-
-                    end
+    end
     
-   
-  x = 101;
+    
+    
+    x = 101;
 
 
 % --- Executes on button press in knn.
@@ -664,3 +675,31 @@ function knn_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of knn
+
+
+
+function perEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to perEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of perEdit as text
+%        str2double(get(hObject,'String')) returns contents of perEdit as a double
+          
+        
+     
+        
+   
+
+
+% --- Executes during object creation, after setting all properties.
+function perEdit_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to perEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
