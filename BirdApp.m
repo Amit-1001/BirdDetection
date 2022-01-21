@@ -527,7 +527,7 @@ op8 = get(handles.knn,'value');
     x = 100;
         if(op7==1)
               
-                net = feedforwardnet([13,25]); % for 13 its 55% 
+                net = feedforwardnet([13,5]); % for 13 its 55% 
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
@@ -621,30 +621,30 @@ op7 = get(handles.FFBPNN,'value');
            disp(res)
                 numRows = size(res,1);
           
-                 %res(res~=repmat(max(res),numRows,1)) = 0 % for finding max in each row
+                 res(res~=repmat(max(res),numRows,1)) = 0 % for finding max in each row
                 % disp(numberTe-numberTr)
                  %disp((numberTe-numberTr)*numberB)
                  disp(totalB);
                   
                for i=1:totalB
                     count=1
-                    max = res(1,i);
+                    maxNum = res(1,i);
                     for j=1:numberB
-                        if(res(j,i)>max)
+                        if(res(j,i)>maxNum)
                             count=j
-                            max = res(j,i)
+                            maxNum = res(j,i)
 
                         end
                         newTemp(j,i) = 0
                     end
-                    newTemp(count,i)=max
+                    newTemp(count,i)=maxNum
                 end
 
                 % Find the accuracy
                 birdCol=1
                 accuracy = 0
                 for i=1:numberB
-                    for j=1:numberB
+                    for j=1:numberTe-numberTr
                         if(newTemp(i,birdCol)>0)
                             accuracy = accuracy+1
                         end
