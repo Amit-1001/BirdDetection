@@ -22,7 +22,7 @@ function varargout = BirdApp(varargin)
 
 % Edit the above text to modify the response to help BirdApp
 
-% Last Modified by GUIDE v2.5 21-Jan-2022 13:51:51
+% Last Modified by GUIDE v2.5 22-Jan-2022 17:04:01
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -112,6 +112,8 @@ if opn1 == 1
             a = miraudio(x); %MIRToolbox object
 
             mf=mfcc_common(x,fs,13); % first 13 component of mfcc
+            disp(mf);
+            
             mf = mf'; %transpose
             Training_feature(n,1:13) = mf(1,1:13); % storing feature of each mfcc component
             n = n+1;
@@ -518,16 +520,18 @@ numberTr = str2double(temp2); % number of training bird
 numberTe = str2double(temp3); %number of Testing bird
 
 setdemorandstream(491218382)
-op6 = get(handles.MSVM,'value');
+
 op7 = get(handles.FFBPNN,'value');
 
-op8 = get(handles.knn,'value');
+op6 = get(handles.RNN,'value');
 
       
     x = 100;
         if(op7==1)
               
-                net = feedforwardnet([13,5]); % for 13 its 55% 
+                net = feedforwardnet([20,20,4]); % for 13 its 55% 
+                
+               
                 
                 % Now the network is ready to be trained. The samples are automatically
                 % divided into training, validation and test sets. The training set is
@@ -537,8 +541,7 @@ op8 = get(handles.knn,'value');
                 load 'training_feature.mat' 'Training_feature'
                 load 'DATA.mat'  'Target_Tr'
 
-                Training_feature
-                Target_Tr
+               
                 %figure(10)
                 %view(net)
 
@@ -554,23 +557,22 @@ op8 = get(handles.knn,'value');
         
         if(op6==1)
           
-            
+               load 'training_feature.mat' 'Training_feature'
+                load 'DATA.mat'  'Target_Tr'
+                
+                net = newelm(minmax(Training_feature'),[100,50,20,1],{'tansig','logsig','tansig','purelin'},'trainscg');
+                
+                [net,tr] = train(net,Training_feature',Target_Tr); %taking transpose of Traning_feature
+                
+                
+                
+                
+                save 'net.mat' 'net'
+                save 'Data.mat' 'tr'
+                
         end
         
-        if(op8==1)
-            
-              load 'training_feature.mat' 'Training_feature'
-              load 'testing_feature.mat' 'Testing_feature'
-              load 'DATA.mat'  'Target_Tr'
-            
-            [predicted_labels,nn_index,accuracy] = KNN_(3,Training_feature,[1,2,3,4,5],Testing_feature)
-            
-            disp(predicted_labels)
-            disp(nn_index)
-            disp(accuracy)
-            
-        
-        end
+       
         
         
         
@@ -602,9 +604,10 @@ totalB = numberTe - numberTr;
 totalB = numberB * totalB;
 
 
-op6 = get(handles.MSVM,'value');
+
 op7 = get(handles.FFBPNN,'value'); 
 %op8 = get(handles.KNN,'value');
+op6 = get(handles.RNN,'value');
 
     if(op6==1)
     
@@ -703,3 +706,12 @@ function perEdit_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in RNN.
+function RNN_Callback(hObject, eventdata, handles)
+% hObject    handle to RNN (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of RNN
